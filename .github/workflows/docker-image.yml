@@ -1,0 +1,37 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2.12'
+        extensions: mbstring, intl
+
+    - name: Install Dependencies
+      run: composer install
+
+    - name: Build Docker Image
+      run: |
+        docker build -t faisaltsa23/minikube:${{ github.sha }} .
+        docker tag faisaltsa23/minikube:${{ github.sha }} faisaltsa23/minikube
+
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u faisaltsa23 --password-stdin
+
+    - name: Push Docker Image
+      run: |
+        docker push faisaltsa23/minikube:${{ github.sha }}
+        docker push faisaltsa23/minikube:latest
+
