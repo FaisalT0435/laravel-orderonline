@@ -1,0 +1,20 @@
+# alertmanager.yaml
+
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by: ['alertname', 'job']
+
+  routes:
+    - receiver: 'slack'
+      match:
+        severity: critical
+
+receivers:
+  - name: 'slack'
+    slack_configs:
+      - send_resolved: true
+        username: 'prometheus'
+        channel: '#auto'
+        api_url: 'Yhttps://hooks.slack.com/services/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'
